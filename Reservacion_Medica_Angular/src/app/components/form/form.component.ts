@@ -2,25 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Reserva } from '../../models/reserva.model';
 import { ReservaService } from '../../services/reserva.service';
+import { EstadoReserva } from '../../models/reserva.model';
 
 @Component({
   selector: 'app-form',
   standalone: true,
-  imports: [ReactiveFormsModule], // Necesario para que Angular reconozca [formGroup] y formControlName en el HTML
+  imports: [ReactiveFormsModule], 
   styleUrl: './form.css',
   templateUrl: './form.html',
 })
 export class FormComponent implements OnInit {
-  // FormGroup es el contenedor principal que agrupa todos los controles del formulario
   reservaForm: FormGroup;
+  private reservaOriginal: Reserva | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private reservaService: ReservaService // Inyectamos el servicio para gestionar los datos
+    private reservaService: ReservaService 
   ) {
-    // FormBuilder es un servicio que simplifica la creación de grupos de controles
     this.reservaForm = this.fb.group({
-      // Cada campo es un FormControl: [valorInicial, [validadores]]
       pacienteNombre: ['', [Validators.required]],
       dpi: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
@@ -30,28 +29,54 @@ export class FormComponent implements OnInit {
       fecha: ['', [Validators.required]],
       hora: ['', [Validators.required]],
       motivo: ['', [Validators.required]],
-      primeraConsulta: [false] // Checkbox: valor booleano inicial
+      primeraConsulta: [false]
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Comprobamos si hay una reserva marcada para edición en el servicio
+    const reservaParaEditar = this.reservaService.getReservaEnEdicion();
+    if (reservaParaEditar) {
+      this.reservaOriginal = reservaParaEditar;
+      // Cargamos los datos de la reserva en el formulario
+      this.reservaForm.patchValue(reservaParaEditar);
+      console.log('Formulario cargado en modo edición para:', reservaParaEditar.pacienteNombre);
+    }
+  }
 
   onSubmit(): void {
     if (this.reservaForm.valid) {
-      // Extraemos los valores del formulario y los asignamos a nuestra interfaz Reserva
-      const nuevaReserva: Reserva = this.reservaForm.value;
+      const datosFormulario: Reserva = this.reservaForm.value;
 
-      // Guardamos la reservación en el servicio (arreglo en memoria)
-      this.reservaService.agregarReserva(nuevaReserva);
+      if (this.reservaOriginal) {
+        // MODO EDICIÓN: Actualizamos la reserva existente conservando su estado original
+        const reservaActualizada: Reserva = {
+          ...datosFormulario,
+          estadoReserva: this.reservaOriginal.estadoReserva
+        };
+        
+        this.reservaService.actualizarReservaPorObjeto(this.reservaOriginal, reservaActualizada);
+        console.log('Reserva actualizada exitosamente');
+      } else {
+        // MODO CREACIÓN: Creamos una nueva reserva con estado PROGRAMADA
+        const nuevaReserva: Reserva = {
+          ...datosFormulario,
+          estadoReserva: EstadoReserva.PROGRAMADA
+        };
+        
+        this.reservaService.agregarReserva(nuevaReserva);
+        console.log('Nueva reserva guardada exitosamente');
+      }
 
-      console.log('Reserva guardada exitosamente');
-
-      // Reiniciamos el formulario para permitir una nueva entrada
+      // Limpiamos el estado de edición en el servicio y reiniciamos el formulario
+      this.reservaService.setReservaEnEdicion(null);
+      this.reservaOriginal = null;
       this.reservaForm.reset({
-        primeraConsulta: false // Aseguramos que el checkbox vuelva a falso
+        primeraConsulta: false
       });
     } else {
       console.error('El formulario contiene errores de validación');
     }
   }
 }
+

@@ -32,7 +32,6 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Aquí se iterarán las reservas con *ngFor -->
         <tr *ngFor="let reserva of reservas">
           <td>{{ reserva.pacienteNombre }}</td>
           <td>{{ reserva.especialidad }}</td>
@@ -46,12 +45,12 @@
           </td>
           <td>
             <div class="action-buttons">
-              <button class="btn-edit" title="Editar">✏️</button>
-              <button class="btn-delete" title="Eliminar">🗑️</button>
+              <button class="btn-edit" title="Editar" (click)="editarReserva(reserva)">✏️</button>
+               <button class="btn-cancel" title="Cancelar reserva" (click)="cancelarReserva(reserva)">❌</button>
+              <button class="btn-delete" title="Eliminar" (click)="eliminarReserva(reserva)">🗑️</button>
             </div>
           </td>
         </tr>
-        <!-- Mensaje en caso de que no haya datos -->
         <tr *ngIf="reservas.length === 0">
           <td colspan="7" class="no-data">No hay reservas disponibles en este momento.</td>
         </tr>

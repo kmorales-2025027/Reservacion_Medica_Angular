@@ -14,6 +14,6 @@ export interface Reserva {
   fecha: string;
   hora: string;
   motivo: string;
-  primeraConsulta: boolean;
+  primeraConsulta?: boolean;
   estadoReserva: EstadoReserva;
 }
