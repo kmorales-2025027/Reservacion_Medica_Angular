@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Reserva } from '../../models/reserva.model';
+import { ReservaService } from '../../services/reserva.service';
 
 @Component({
   selector: 'app-form',
@@ -13,7 +14,10 @@ export class FormComponent implements OnInit {
   // FormGroup es el contenedor principal que agrupa todos los controles del formulario
   reservaForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private reservaService: ReservaService // Inyectamos el servicio para gestionar los datos
+  ) {
     // FormBuilder es un servicio que simplifica la creación de grupos de controles
     this.reservaForm = this.fb.group({
       // Cada campo es un FormControl: [valorInicial, [validadores]]
@@ -36,9 +40,18 @@ export class FormComponent implements OnInit {
     if (this.reservaForm.valid) {
       // Extraemos los valores del formulario y los asignamos a nuestra interfaz Reserva
       const nuevaReserva: Reserva = this.reservaForm.value;
-      console.log('Nueva Reserva:', nuevaReserva);
 
-      // Para hacer esto funcional, aquí llamaríamos a un servicio que guarde en el arreglo
+      // Guardamos la reservación en el servicio (arreglo en memoria)
+      this.reservaService.agregarReserva(nuevaReserva);
+
+      console.log('Reserva guardada exitosamente');
+
+      // Reiniciamos el formulario para permitir una nueva entrada
+      this.reservaForm.reset({
+        primeraConsulta: false // Aseguramos que el checkbox vuelva a falso
+      });
+    } else {
+      console.error('El formulario contiene errores de validación');
     }
   }
 }
