@@ -62,8 +62,11 @@ export class FormComponent implements OnInit {
         estado: 'Programada'
       };
 
-      // [PUNTO DE INVOCACIÓN]: Aquí se debe llamar a ReservaService para verificar choques de horario
-      // Ejemplo: if (this.reservaService.verificarChoqueHorario(reservaConEstado.fecha, reservaConEstado.hora)) { ... }
+      // Verificación de choques de horario antes de guardar la reserva
+      if (this.reservaService.verificarChoqueHorario(reservaConEstado.fecha, reservaConEstado.hora)) {
+        alert('La fecha y hora seleccionadas ya están reservadas. Por favor, elija otro horario.');
+        return; // Detiene la ejecución para evitar que se guarde la reserva
+      }
 
       // Persistencia de la reserva en el servicio
       this.reservaService.agregarReserva(reservaConEstado as any);
