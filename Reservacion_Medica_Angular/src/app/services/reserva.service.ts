@@ -11,6 +11,18 @@ export class ReservaService {
   constructor() {}
 
   /**
+   * Verifica si existe una cita en la misma fecha y hora
+   * @param fecha Fecha a verificar
+   * @param hora Hora a verificar
+   * @returns true si hay un choque, false si está disponible
+   */
+  verificarChoqueHorario(fecha: string, hora: string): boolean {
+    return this.reservaciones.some(reserva =>
+      reserva.fecha === fecha && reserva.hora === hora
+    );
+  }
+
+  /**
    * Agrega una nueva reservación al arreglo en memoria
    * @param reserva Objeto de tipo Reserva con los datos del formulario
    */
