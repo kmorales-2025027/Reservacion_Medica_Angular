@@ -5,8 +5,8 @@ import { Reserva, EstadoReserva } from '../models/reserva.model';
   providedIn: 'root'
 })
 export class ReservaService {
-  // Arreglo en memoria para almacenar las reservaciones
   private reservaciones: Reserva[] = [];
+  private reservaEnEdicion: Reserva | null = null;
 
   constructor() {}
 
@@ -28,13 +28,8 @@ export class ReservaService {
    */
   agregarReserva(reserva: Reserva): void {
     this.reservaciones.push(reserva);
-    console.log('Registros actuales en memoria:', this.reservaciones);
   }
 
-  /**
-   * Retorna la lista completa de reservaciones
-   * @returns Arreglo de reservaciones
-   */
   obtenerReservaciones(): Reserva[] {
     return this.reservaciones;
   }
@@ -49,14 +44,41 @@ export class ReservaService {
     return this.reservaciones.filter(reserva => {
       const coincidenNombre = !nombre || nombre.trim() === '' || 
         reserva.pacienteNombre.toLowerCase().includes(nombre.toLowerCase());
-      
       const coincideEstado = !estado || estado === 'TODOS' || 
         reserva.estadoReserva === estado;
-        
       return coincidenNombre && coincideEstado;
     });
   }
+
+  eliminarReservaPorObjeto(reserva: Reserva): void {
+    this.reservaciones = this.reservaciones.filter(r => r !== reserva);
+  }
+
+  actualizarReservaPorObjeto(reservaOriginal: Reserva, reservaActualizada: Reserva): void {
+    const index = this.reservaciones.indexOf(reservaOriginal);
+    if (index !== -1) {
+      this.reservaciones[index] = reservaActualizada;
+    }
+  }
+
+  /**
+   * Actualiza únicamente el estado de una reserva
+   */
+  actualizarEstadoReserva(reserva: Reserva, nuevoEstado: EstadoReserva): void {
+    reserva.estadoReserva = nuevoEstado;
+  }
+
+  setReservaEnEdicion(reserva: Reserva | null): void {
+    this.reservaEnEdicion = reserva;
+  }
+
+  getReservaEnEdicion(): Reserva | null {
+    return this.reservaEnEdicion;
+  }
 }
+
+
+
 
 
 
