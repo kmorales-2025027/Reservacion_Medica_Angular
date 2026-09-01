@@ -1,57 +1,111 @@
 import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Reserva } from '../../models/reserva.model';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors
+} from '@angular/forms';
+import { Reserva, EstadoReserva } from '../../models/reserva.model';
 import { ReservaService } from '../../services/reserva.service';
 
 @Component({
   selector: 'app-form',
   standalone: true,
-  imports: [ReactiveFormsModule], // Necesario para que Angular reconozca [formGroup] y formControlName en el HTML
-  styleUrl: './form.css',
-  templateUrl: './form.html',
+  imports: [ReactiveFormsModule],
+  styleUrl: './form.component.css',
+  templateUrl: './form.component.html',
 })
 export class FormComponent implements OnInit {
-  // FormGroup es el contenedor principal que agrupa todos los controles del formulario
+
   reservaForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private reservaService: ReservaService // Inyectamos el servicio para gestionar los datos
+    private reservaService: ReservaService
   ) {
-    // FormBuilder es un servicio que simplifica la creación de grupos de controles
     this.reservaForm = this.fb.group({
-      // Cada campo es un FormControl: [valorInicial, [validadores]]
       pacienteNombre: ['', [Validators.required]],
-      dpi: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      telefono: ['', [Validators.required]],
+
+      // DPI guatemalteco: 13 dígitos
+      dpi: ['', [
+        Validators.required,
+        Validators.pattern(/^\d{13}$/)
+      ]],
+
+      email: ['', [
+        Validators.required,
+        Validators.email
+      ]],
+
+      // Teléfono: 8 dígitos
+      telefono: ['', [
+        Validators.required,
+        Validators.pattern(/^\d{8}$/)
+      ]],
+
       especialidad: ['', [Validators.required]],
+
       medico: ['', [Validators.required]],
-      fecha: ['', [Validators.required]],
+
+      // No permite seleccionar una fecha anterior a hoy
+      fecha: ['', [
+        Validators.required,
+        this.fechaNoAnteriorValidator
+      ]],
+
       hora: ['', [Validators.required]],
-      motivo: ['', [Validators.required]],
-      primeraConsulta: [false] // Checkbox: valor booleano inicial
+
+      motivo: ['', [
+        Validators.required,
+        Validators.maxLength(500)
+      ]],
+
+      primeraConsulta: [false]
     });
   }
 
   ngOnInit(): void {}
 
-  onSubmit(): void {
-    if (this.reservaForm.valid) {
-      // Extraemos los valores del formulario y los asignamos a nuestra interfaz Reserva
-      const nuevaReserva: Reserva = this.reservaForm.value;
-
-      // Guardamos la reservación en el servicio (arreglo en memoria)
-      this.reservaService.agregarReserva(nuevaReserva);
-
-      console.log('Reserva guardada exitosamente');
-
-      // Reiniciamos el formulario para permitir una nueva entrada
-      this.reservaForm.reset({
-        primeraConsulta: false // Aseguramos que el checkbox vuelva a falso
-      });
-    } else {
-      console.error('El formulario contiene errores de validación');
+  /**
+   * Valida que la fecha seleccionada no sea anterior a la fecha actual.
+   */
+  fechaNoAnteriorValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
     }
+
+    const fechaSeleccionada = new Date(control.value + 'T00:00:00');
+    const hoy = new Date();
+
+    hoy.setHours(0, 0, 0, 0);
+
+    return fechaSeleccionada < hoy
+      ? { fechaAnterior: true }
+      : null;
+  }
+
+  /**
+   * Registra una nueva reserva.
+   */
+  onSubmit(): void {
+    if (this.reservaForm.invalid) {
+      this.reservaForm.markAllAsTouched();
+      return;
+    }
+
+    const nuevaReserva: Reserva = {
+      ...this.reservaForm.value,
+      estadoReserva: EstadoReserva.PROGRAMADA
+    };
+
+    this.reservaService.agregarReserva(nuevaReserva);
+
+    console.log('Reserva guardada exitosamente');
+
+    this.reservaForm.reset({
+      primeraConsulta: false
+    });
   }
 }
