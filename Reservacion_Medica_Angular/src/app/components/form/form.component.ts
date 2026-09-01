@@ -23,7 +23,7 @@ export function fechaFuturaValidator(control: AbstractControl): ValidationErrors
   templateUrl: './form.component.html',
 })
 export class FormComponent implements OnInit {
-  // Grupo de controles que representa el formulario de reservación
+
   reservaForm: FormGroup;
 
   constructor(
@@ -75,5 +75,18 @@ export class FormComponent implements OnInit {
     } else {
       console.error('El formulario contiene errores de validación');
     }
+
+    const nuevaReserva: Reserva = {
+      ...this.reservaForm.value,
+      estadoReserva: EstadoReserva.PROGRAMADA
+    };
+
+    this.reservaService.agregarReserva(nuevaReserva);
+
+    console.log('Reserva guardada exitosamente');
+
+    this.reservaForm.reset({
+      primeraConsulta: false
+    });
   }
 }

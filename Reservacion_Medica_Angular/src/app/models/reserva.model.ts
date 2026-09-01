@@ -3,7 +3,7 @@ export enum EstadoReserva {
   ATENDIDA = 'ATENDIDA',
   CANCELADA = 'CANCELADA'
 }
- 
+
 export interface Reserva {
   pacienteNombre: string;
   dpi: string;
