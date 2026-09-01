@@ -48,15 +48,28 @@ export class FormComponent implements OnInit {
   ngOnInit(): void {}
 
   /**
-   * Maneja el envío del formulario. Valida que el formulario sea correcto antes de enviar los datos al servicio.
+   * Maneja el envío del formulario. 
+   * Valida la integridad de los datos, añade el estado inicial y gestiona la persistencia.
    */
   onSubmit(): void {
     if (this.reservaForm.valid) {
-      const nuevaReserva: Reserva = this.reservaForm.value;
-      this.reservaService.agregarReserva(nuevaReserva);
-      console.log('Reserva guardada exitosamente');
+      // Extracción de los valores actuales del formulario
+      const formValues = this.reservaForm.value;
+
+      // Creación de un nuevo objeto que combina los datos del formulario con el estado inicial 'Programada'
+      const reservaConEstado = {
+        ...formValues,
+        estado: 'Programada'
+      };
+
+      // [PUNTO DE INVOCACIÓN]: Aquí se debe llamar a ReservaService para verificar choques de horario
+      // Ejemplo: if (this.reservaService.verificarChoqueHorario(reservaConEstado.fecha, reservaConEstado.hora)) { ... }
+
+      // Persistencia de la reserva en el servicio
+      this.reservaService.agregarReserva(reservaConEstado as any);
+      console.log('Reserva guardada exitosamente con estado Programada');
       
-      // Reinicia el formulario manteniendo el estado inicial de primeraConsulta
+      // Limpieza del formulario devolviéndolo a su estado original
       this.reservaForm.reset({
         primeraConsulta: false
       });
