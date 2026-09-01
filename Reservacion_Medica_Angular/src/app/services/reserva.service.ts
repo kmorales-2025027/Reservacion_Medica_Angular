@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Reserva } from '../models/reserva.model';
+import { Reserva, EstadoReserva } from '../models/reserva.model';
 
 @Injectable({
   providedIn: 'root'
@@ -26,4 +26,25 @@ export class ReservaService {
   obtenerReservaciones(): Reserva[] {
     return this.reservaciones;
   }
+
+  /**
+   * Filtra las reservaciones por el nombre del paciente y/o estado
+   * @param nombre Nombre o parte del nombre del paciente a buscar
+   * @param estado Estado de la reserva para filtrar
+   * @returns Arreglo de reservaciones filtradas
+   */
+  filtrarReservas(nombre: string, estado: EstadoReserva | 'TODOS'): Reserva[] {
+    return this.reservaciones.filter(reserva => {
+      const coincidenNombre = !nombre || nombre.trim() === '' || 
+        reserva.pacienteNombre.toLowerCase().includes(nombre.toLowerCase());
+      
+      const coincideEstado = !estado || estado === 'TODOS' || 
+        reserva.estadoReserva === estado;
+        
+      return coincidenNombre && coincideEstado;
+    });
+  }
 }
+
+
+

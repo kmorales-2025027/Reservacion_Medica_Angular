@@ -1,3 +1,9 @@
+export enum EstadoReserva {
+  PROGRAMADA = 'PROGRAMADA',
+  ATENDIDA = 'ATENDIDA',
+  CANCELADA = 'CANCELADA'
+}
+
 export interface Reserva {
   pacienteNombre: string;
   dpi: string;
@@ -9,4 +15,5 @@ export interface Reserva {
   hora: string;
   motivo: string;
   primeraConsulta: boolean;
+  estadoReserva: EstadoReserva;
 }
