@@ -17,3 +17,4 @@ export interface Reserva {
   primeraConsulta?: boolean;
   estadoReserva: EstadoReserva;
 }
+ 
