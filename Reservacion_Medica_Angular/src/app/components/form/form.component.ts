@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Reserva } from '../../models/reserva.model';
+import { Reserva, EstadoReserva } from '../../models/reserva.model';
 import { ReservaService } from '../../services/reserva.service';
 
 /**
@@ -19,8 +19,8 @@ export function fechaFuturaValidator(control: AbstractControl): ValidationErrors
   selector: 'app-form',
   standalone: true,
   imports: [ReactiveFormsModule],
-  styleUrl: './form.css',
-  templateUrl: './form.html',
+  styleUrl: './form.component.css',
+  templateUrl: './form.component.html',
 })
 export class FormComponent implements OnInit {
   // Grupo de controles que representa el formulario de reservación
@@ -41,40 +41,36 @@ export class FormComponent implements OnInit {
       fecha: ['', [Validators.required, fechaFuturaValidator]], // Obligatorio y debe ser hoy o futuro
       hora: ['', [Validators.required]], // Obligatorio
       motivo: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]], // Obligatorio, entre 10 y 200 caracteres
-      primeraConsulta: [false] // Booleano, valor por defecto false
+      primeraConsulta: [false], // Booleano, valor por defecto false
+      estadoReserva: [EstadoReserva.PROGRAMADA] // Campo de estado con valor inicial 'PROGRAMADA'
     });
   }
 
   ngOnInit(): void {}
 
   /**
-   * Maneja el envío del formulario. 
-   * Valida la integridad de los datos, añade el estado inicial y gestiona la persistencia.
+   * Maneja el envío del formulario.
+   * Valida la integridad de los datos, verifica disponibilidad y gestiona la persistencia.
    */
   onSubmit(): void {
     if (this.reservaForm.valid) {
-      // Extracción de los valores actuales del formulario
-      const formValues = this.reservaForm.value;
-
-      // Creación de un nuevo objeto que combina los datos del formulario con el estado inicial 'Programada'
-      const reservaConEstado = {
-        ...formValues,
-        estado: 'Programada'
-      };
+      // Extracción de los valores actuales del formulario (ya incluyen el estadoReserva)
+      const nuevaReserva: Reserva = this.reservaForm.value;
 
       // Verificación de choques de horario antes de guardar la reserva
-      if (this.reservaService.verificarChoqueHorario(reservaConEstado.fecha, reservaConEstado.hora)) {
+      if (this.reservaService.verificarChoqueHorario(nuevaReserva.fecha, nuevaReserva.hora)) {
         alert('La fecha y hora seleccionadas ya están reservadas. Por favor, elija otro horario.');
         return; // Detiene la ejecución para evitar que se guarde la reserva
       }
 
       // Persistencia de la reserva en el servicio
-      this.reservaService.agregarReserva(reservaConEstado as any);
-      console.log('Reserva guardada exitosamente con estado Programada');
-      
+      this.reservaService.agregarReserva(nuevaReserva);
+      console.log('Reserva guardada exitosamente');
+
       // Limpieza del formulario devolviéndolo a su estado original
       this.reservaForm.reset({
-        primeraConsulta: false
+        primeraConsulta: false,
+        estadoReserva: EstadoReserva.PROGRAMADA
       });
     } else {
       console.error('El formulario contiene errores de validación');
