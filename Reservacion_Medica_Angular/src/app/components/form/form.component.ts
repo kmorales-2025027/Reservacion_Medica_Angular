@@ -1,54 +1,64 @@
 import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Reserva } from '../../models/reserva.model';
 import { ReservaService } from '../../services/reserva.service';
+
+/**
+ * Validador personalizado para asegurar que la fecha seleccionada no sea anterior al día actual.
+ * @param control El control de formulario que contiene la fecha.
+ * @returns ValidationErrors si la fecha es pasada, o null si es válida.
+ */
+export function fechaFuturaValidator(control: AbstractControl): ValidationErrors | null {
+  const fechaSeleccionada = new Date(control.value);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0); // Normalizar hoy a medianoche para comparar solo fechas
+  return fechaSeleccionada < hoy ? { fechaPasada: true } : null;
+}
 
 @Component({
   selector: 'app-form',
   standalone: true,
-  imports: [ReactiveFormsModule], // Necesario para que Angular reconozca [formGroup] y formControlName en el HTML
+  imports: [ReactiveFormsModule],
   styleUrl: './form.css',
   templateUrl: './form.html',
 })
 export class FormComponent implements OnInit {
-  // FormGroup es el contenedor principal que agrupa todos los controles del formulario
+  // Grupo de controles que representa el formulario de reservación
   reservaForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private reservaService: ReservaService // Inyectamos el servicio para gestionar los datos
+    private reservaService: ReservaService
   ) {
-    // FormBuilder es un servicio que simplifica la creación de grupos de controles
+    // Inicialización del formulario con validaciones basadas en los requerimientos de la interfaz Reserva
     this.reservaForm = this.fb.group({
-      // Cada campo es un FormControl: [valorInicial, [validadores]]
-      pacienteNombre: ['', [Validators.required]],
-      dpi: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      telefono: ['', [Validators.required]],
-      especialidad: ['', [Validators.required]],
-      medico: ['', [Validators.required]],
-      fecha: ['', [Validators.required]],
-      hora: ['', [Validators.required]],
-      motivo: ['', [Validators.required]],
-      primeraConsulta: [false] // Checkbox: valor booleano inicial
+      pacienteNombre: ['', [Validators.required, Validators.minLength(5)]], // Obligatorio, min 5 caracteres
+      dpi: ['', [Validators.required, Validators.pattern('^[0-9]{13}$')]], // Obligatorio, exactamente 13 dígitos
+      email: ['', [Validators.email]], // Opcional, pero debe tener formato de email si se llena
+      telefono: ['', [Validators.required, Validators.pattern('^[0-9]{8}$')]], // Obligatorio, exactamente 8 dígitos
+      especialidad: ['', [Validators.required]], // Obligatorio
+      medico: ['', [Validators.required]], // Obligatorio
+      fecha: ['', [Validators.required, fechaFuturaValidator]], // Obligatorio y debe ser hoy o futuro
+      hora: ['', [Validators.required]], // Obligatorio
+      motivo: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]], // Obligatorio, entre 10 y 200 caracteres
+      primeraConsulta: [false] // Booleano, valor por defecto false
     });
   }
 
   ngOnInit(): void {}
 
+  /**
+   * Maneja el envío del formulario. Valida que el formulario sea correcto antes de enviar los datos al servicio.
+   */
   onSubmit(): void {
     if (this.reservaForm.valid) {
-      // Extraemos los valores del formulario y los asignamos a nuestra interfaz Reserva
       const nuevaReserva: Reserva = this.reservaForm.value;
-
-      // Guardamos la reservación en el servicio (arreglo en memoria)
       this.reservaService.agregarReserva(nuevaReserva);
-
       console.log('Reserva guardada exitosamente');
-
-      // Reiniciamos el formulario para permitir una nueva entrada
+      
+      // Reinicia el formulario manteniendo el estado inicial de primeraConsulta
       this.reservaForm.reset({
-        primeraConsulta: false // Aseguramos que el checkbox vuelva a falso
+        primeraConsulta: false
       });
     } else {
       console.error('El formulario contiene errores de validación');
