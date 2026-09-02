@@ -7,7 +7,7 @@ export enum EstadoReserva {
 export interface Reserva {
   pacienteNombre: string;
   dpi: string;
-  email: string;
+  email?: string;
   telefono: string;
   especialidad: string;
   medico: string;

@@ -18,8 +18,24 @@
     </select>
   </div>
 
+  <!-- RETO ADICIONAL: CONTADOR DE CITAS -->
+  <div class="resumen-container">
+    <div class="resumen-card">
+      <span>Total de Citas: <strong>{{ totalReservas }}</strong></span>
+    </div>
+    <div class="resumen-card">
+      <span>Programadas: <strong>{{ totalProgramadas }}</strong></span>
+    </div>
+    <div class="resumen-card">
+      <span>Atendidas: <strong>{{ totalAtendidas }}</strong></span>
+    </div>
+    <div class="resumen-card">
+      <span>Canceladas: <strong>{{ totalCanceladas }}</strong></span>
+    </div>
+  </div>
+
   <div class="table-container">
-    <table class="reserva-table">
+    <table class="reserva-table" *ngIf="reservas.length != 0; else sinReservas">
       <thead>
         <tr>
           <th>Paciente</th>
@@ -46,16 +62,17 @@
           <td>
             <div class="action-buttons">
               <button class="btn-edit" title="Editar" (click)="editarReserva(reserva)">✏️</button>
-               <button class="btn-cancel" title="Cancelar reserva" (click)="cancelarReserva(reserva)">❌</button>
+              <button class="btn-cancel" title="Cancelar reserva" (click)="cancelarReserva(reserva)">❌</button>
               <button class="btn-delete" title="Eliminar" (click)="eliminarReserva(reserva)">🗑️</button>
             </div>
           </td>
         </tr>
-        <tr *ngIf="reservas.length === 0">
-          <td colspan="7" class="no-data">No hay reservas disponibles en este momento.</td>
-        </tr>
       </tbody>
     </table>
+
+    <ng-template #sinReservas>
+      <p>No hay reservas disponibles en este momento.</p>
+    </ng-template>
   </div>
 </div>
 

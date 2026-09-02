@@ -24,6 +24,13 @@
             El nombre del paciente es obligatorio.
           </small>
         }
+        
+        @if (reservaForm.get('pacienteNombre')?.touched &&
+             reservaForm.get('pacienteNombre')?.hasError('minlength')) {
+          <small class="error-message">
+            El nombre del paciente debe contener al menos 5 caracteres.
+          </small>
+        }
       </div>
 
       <!-- DPI -->
@@ -61,13 +68,6 @@
           formControlName="email"
           placeholder="ejemplo@correo.com"
         >
-
-        @if (reservaForm.get('email')?.touched &&
-             reservaForm.get('email')?.hasError('required')) {
-          <small class="error-message">
-            El correo electrónico es obligatorio.
-          </small>
-        }
 
         @if (reservaForm.get('email')?.touched &&
              reservaForm.get('email')?.hasError('email')) {
@@ -140,6 +140,13 @@
             El nombre del médico es obligatorio.
           </small>
         }
+
+        @if (reservaForm.get('medico')?.touched &&
+             reservaForm.get('medico')?.hasError('minlength')) {
+          <small class="error-message">
+            El nombre del médico debe contener al menos 5 caracteres.
+          </small>
+        }
       </div>
 
       <!-- Fecha -->
@@ -159,7 +166,7 @@
         }
 
         @if (reservaForm.get('fecha')?.touched &&
-             reservaForm.get('fecha')?.hasError('fechaAnterior')) {
+             reservaForm.get('fecha')?.hasError('fechaPasada')) {
           <small class="error-message">
             No puede seleccionar una fecha anterior a hoy.
           </small>
@@ -193,13 +200,13 @@
         id="motivo"
         formControlName="motivo"
         rows="4"
-        maxlength="500"
+        maxlength="200"
         placeholder="Describa brevemente el motivo de la consulta"
       ></textarea>
 
       <div class="field-footer">
         <small>
-          {{ reservaForm.get('motivo')?.value?.length || 0 }}/500 caracteres
+          {{ reservaForm.get('motivo')?.value?.length || 0 }}/200 caracteres
         </small>
 
         @if (reservaForm.get('motivo')?.touched &&
@@ -210,9 +217,15 @@
         }
       </div>
 
+      @if (reservaForm.get('motivo')?.hasError('minlength')) {
+        <small class="error-message">
+          El motivo debe contener al menos 10 caracteres.
+        </small>
+      }
+
       @if (reservaForm.get('motivo')?.hasError('maxlength')) {
         <small class="error-message">
-          El motivo no puede superar los 500 caracteres.
+          El motivo no puede superar los 200 caracteres.
         </small>
       }
     </div>
