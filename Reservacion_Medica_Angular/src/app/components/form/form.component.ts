@@ -2,6 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Reserva, EstadoReserva } from '../../models/reserva.model';
 import { ReservaService } from '../../services/reserva.service';
+import { EstadoReserva } from '../../models/reserva.model';
+
+/**
+ * Validador personalizado para asegurar que la fecha seleccionada no sea anterior al día actual.
+ * @param control El control de formulario que contiene la fecha.
+ * @returns ValidationErrors si la fecha es pasada, o null si es válida.
+ */
+export function fechaFuturaValidator(control: AbstractControl): ValidationErrors | null {
+  const fechaSeleccionada = new Date(control.value);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0); // Normalizar hoy a medianoche para comparar solo fechas
+  return fechaSeleccionada < hoy ? { fechaPasada: true } : null;
+}
 
 /**
  * Validador personalizado para asegurar que la fecha seleccionada no sea anterior al día actual.
@@ -23,7 +36,7 @@ export function fechaFuturaValidator(control: AbstractControl): ValidationErrors
   templateUrl: './form.component.html',
 })
 export class FormComponent implements OnInit {
-  // Grupo de controles que representa el formulario de reservación
+
   reservaForm: FormGroup;
   private reservaOriginal: Reserva | null = null;
 
@@ -47,7 +60,16 @@ export class FormComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    // Comprobamos si hay una reserva marcada para edición en el servicio
+    const reservaParaEditar = this.reservaService.getReservaEnEdicion();
+    if (reservaParaEditar) {
+      this.reservaOriginal = reservaParaEditar;
+      // Cargamos los datos de la reserva en el formulario
+      this.reservaForm.patchValue(reservaParaEditar);
+      console.log('Formulario cargado en modo edición para:', reservaParaEditar.pacienteNombre);
+    }
+  }
 
   /**
    * Maneja el envío del formulario.
@@ -90,3 +112,4 @@ export class FormComponent implements OnInit {
     });
   }
 }
+

@@ -1,0 +1,61 @@
+<div class="container">
+  <h2 class="table-title">Listado de Reservas Médicas</h2>
+  
+  <div class="search-container">
+    <input 
+      type="text" 
+      class="search-input" 
+      placeholder="Buscar paciente por nombre..." 
+      [(ngModel)]="filtroNombre" 
+      (input)="onFilterChange()"
+    />
+    
+    <select class="filter-select" [(ngModel)]="filtroEstado" (change)="onFilterChange()">
+      <option value="TODOS">Todos los Estados</option>
+      <option *ngFor="let estado of estadosDisponibles" [value]="estado">
+        {{ estado }}
+      </option>
+    </select>
+  </div>
+
+  <div class="table-container">
+    <table class="reserva-table">
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Especialidad</th>
+          <th>Médico</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reserva of reservas">
+          <td>{{ reserva.pacienteNombre }}</td>
+          <td>{{ reserva.especialidad }}</td>
+          <td>{{ reserva.medico }}</td>
+          <td>{{ reserva.fecha }}</td>
+          <td>{{ reserva.hora }}</td>
+          <td>
+            <span class="status-badge" [attr.data-status]="reserva.estadoReserva">
+              {{ reserva.estadoReserva }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-edit" title="Editar" (click)="editarReserva(reserva)">✏️</button>
+               <button class="btn-cancel" title="Cancelar reserva" (click)="cancelarReserva(reserva)">❌</button>
+              <button class="btn-delete" title="Eliminar" (click)="eliminarReserva(reserva)">🗑️</button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="reservas.length === 0">
+          <td colspan="7" class="no-data">No hay reservas disponibles en este momento.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
