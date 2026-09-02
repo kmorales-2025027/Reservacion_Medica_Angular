@@ -1,0 +1,258 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>Nueva reserva médica</h2>
+    <p>Complete los datos para registrar una nueva cita.</p>
+  </div>
+
+  <form [formGroup]="reservaForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-grid">
+
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="pacienteNombre">Nombre del paciente</label>
+        <input
+          id="pacienteNombre"
+          type="text"
+          formControlName="pacienteNombre"
+          placeholder="Ingrese el nombre completo"
+        >
+
+        @if (reservaForm.get('pacienteNombre')?.touched &&
+             reservaForm.get('pacienteNombre')?.hasError('required')) {
+          <small class="error-message">
+            El nombre del paciente es obligatorio.
+          </small>
+        }
+        
+        @if (reservaForm.get('pacienteNombre')?.touched &&
+             reservaForm.get('pacienteNombre')?.hasError('minlength')) {
+          <small class="error-message">
+            El nombre del paciente debe contener al menos 5 caracteres.
+          </small>
+        }
+      </div>
+
+      <!-- DPI -->
+      <div class="form-group">
+        <label for="dpi">DPI</label>
+        <input
+          id="dpi"
+          type="text"
+          formControlName="dpi"
+          placeholder="Ingrese el DPI"
+          maxlength="13"
+        >
+
+        @if (reservaForm.get('dpi')?.touched &&
+             reservaForm.get('dpi')?.hasError('required')) {
+          <small class="error-message">
+            El DPI es obligatorio.
+          </small>
+        }
+
+        @if (reservaForm.get('dpi')?.touched &&
+             reservaForm.get('dpi')?.hasError('pattern')) {
+          <small class="error-message">
+            El DPI debe contener exactamente 13 dígitos.
+          </small>
+        }
+      </div>
+
+      <!-- Correo -->
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="ejemplo@correo.com"
+        >
+
+        @if (reservaForm.get('email')?.touched &&
+             reservaForm.get('email')?.hasError('email')) {
+          <small class="error-message">
+            Ingrese un correo electrónico válido.
+          </small>
+        }
+      </div>
+
+      <!-- Teléfono -->
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input
+          id="telefono"
+          type="tel"
+          formControlName="telefono"
+          placeholder="Ingrese el teléfono"
+          maxlength="8"
+        >
+
+        @if (reservaForm.get('telefono')?.touched &&
+             reservaForm.get('telefono')?.hasError('required')) {
+          <small class="error-message">
+            El teléfono es obligatorio.
+          </small>
+        }
+
+        @if (reservaForm.get('telefono')?.touched &&
+             reservaForm.get('telefono')?.hasError('pattern')) {
+          <small class="error-message">
+            El teléfono debe contener exactamente 8 dígitos.
+          </small>
+        }
+      </div>
+
+      <!-- Especialidad -->
+      <div class="form-group">
+        <label for="especialidad">Especialidad</label>
+        <select id="especialidad" formControlName="especialidad">
+          <option value="">Seleccione una especialidad</option>
+          <option value="Medicina General">Medicina General</option>
+          <option value="Pediatría">Pediatría</option>
+          <option value="Cardiología">Cardiología</option>
+          <option value="Dermatología">Dermatología</option>
+          <option value="Ginecología">Ginecología</option>
+          <option value="Odontología">Odontología</option>
+        </select>
+
+        @if (reservaForm.get('especialidad')?.touched &&
+             reservaForm.get('especialidad')?.hasError('required')) {
+          <small class="error-message">
+            Seleccione una especialidad.
+          </small>
+        }
+      </div>
+
+      <!-- Médico -->
+      <div class="form-group">
+        <label for="medico">Médico</label>
+        <input
+          id="medico"
+          type="text"
+          formControlName="medico"
+          placeholder="Nombre del médico"
+        >
+
+        @if (reservaForm.get('medico')?.touched &&
+             reservaForm.get('medico')?.hasError('required')) {
+          <small class="error-message">
+            El nombre del médico es obligatorio.
+          </small>
+        }
+
+        @if (reservaForm.get('medico')?.touched &&
+             reservaForm.get('medico')?.hasError('minlength')) {
+          <small class="error-message">
+            El nombre del médico debe contener al menos 5 caracteres.
+          </small>
+        }
+      </div>
+
+      <!-- Fecha -->
+      <div class="form-group">
+        <label for="fecha">Fecha</label>
+        <input
+          id="fecha"
+          type="date"
+          formControlName="fecha"
+        >
+
+        @if (reservaForm.get('fecha')?.touched &&
+             reservaForm.get('fecha')?.hasError('required')) {
+          <small class="error-message">
+            La fecha es obligatoria.
+          </small>
+        }
+
+        @if (reservaForm.get('fecha')?.touched &&
+             reservaForm.get('fecha')?.hasError('fechaPasada')) {
+          <small class="error-message">
+            No puede seleccionar una fecha anterior a hoy.
+          </small>
+        }
+      </div>
+
+      <!-- Hora -->
+      <div class="form-group">
+        <label for="hora">Hora</label>
+        <input
+          id="hora"
+          type="time"
+          formControlName="hora"
+        >
+
+        @if (reservaForm.get('hora')?.touched &&
+             reservaForm.get('hora')?.hasError('required')) {
+          <small class="error-message">
+            La hora es obligatoria.
+          </small>
+        }
+      </div>
+
+    </div>
+
+    <!-- Motivo -->
+    <div class="form-group full-width">
+      <label for="motivo">Motivo de la consulta</label>
+
+      <textarea
+        id="motivo"
+        formControlName="motivo"
+        rows="4"
+        maxlength="200"
+        placeholder="Describa brevemente el motivo de la consulta"
+      ></textarea>
+
+      <div class="field-footer">
+        <small>
+          {{ reservaForm.get('motivo')?.value?.length || 0 }}/200 caracteres
+        </small>
+
+        @if (reservaForm.get('motivo')?.touched &&
+             reservaForm.get('motivo')?.hasError('required')) {
+          <small class="error-message">
+            El motivo de la consulta es obligatorio.
+          </small>
+        }
+      </div>
+
+      @if (reservaForm.get('motivo')?.hasError('minlength')) {
+        <small class="error-message">
+          El motivo debe contener al menos 10 caracteres.
+        </small>
+      }
+
+      @if (reservaForm.get('motivo')?.hasError('maxlength')) {
+        <small class="error-message">
+          El motivo no puede superar los 200 caracteres.
+        </small>
+      }
+    </div>
+
+    <!-- Primera consulta -->
+    <div class="checkbox-group">
+      <input
+        id="primeraConsulta"
+        type="checkbox"
+        formControlName="primeraConsulta"
+      >
+
+      <label for="primeraConsulta">
+        Es la primera consulta del paciente
+      </label>
+    </div>
+
+    <!-- Botón -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="reservaForm.invalid"
+      >
+        Registrar reserva
+      </button>
+    </div>
+
+  </form>
+</div>
