@@ -16,9 +16,9 @@ export class ReservaService {
    * @param hora Hora a verificar
    * @returns true si hay un choque, false si está disponible
    */
-  verificarChoqueHorario(fecha: string, hora: string): boolean {
+  verificarChoqueHorario(fecha: string, hora: string, reservaExcluida?: Reserva | null): boolean {
     return this.reservaciones.some(reserva =>
-      reserva.fecha === fecha && reserva.hora === hora
+      reserva.fecha === fecha && reserva.hora === hora && reserva !== reservaExcluida
     );
   }
 
