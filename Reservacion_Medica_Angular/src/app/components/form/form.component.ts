@@ -2,19 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Reserva, EstadoReserva } from '../../models/reserva.model';
 import { ReservaService } from '../../services/reserva.service';
-import { EstadoReserva } from '../../models/reserva.model';
-
-/**
- * Validador personalizado para asegurar que la fecha seleccionada no sea anterior al día actual.
- * @param control El control de formulario que contiene la fecha.
- * @returns ValidationErrors si la fecha es pasada, o null si es válida.
- */
-export function fechaFuturaValidator(control: AbstractControl): ValidationErrors | null {
-  const fechaSeleccionada = new Date(control.value);
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0); // Normalizar hoy a medianoche para comparar solo fechas
-  return fechaSeleccionada < hoy ? { fechaPasada: true } : null;
-}
 
 /**
  * Validador personalizado para asegurar que la fecha seleccionada no sea anterior al día actual.
@@ -51,7 +38,7 @@ export class FormComponent implements OnInit {
       email: ['', [Validators.email]], // Opcional, pero debe tener formato de email si se llena
       telefono: ['', [Validators.required, Validators.pattern('^[0-9]{8}$')]], // Obligatorio, exactamente 8 dígitos
       especialidad: ['', [Validators.required]], // Obligatorio
-      medico: ['', [Validators.required]], // Obligatorio
+      medico: ['', [Validators.required, Validators.minLength(5)]], // Obligatorio, min 5 caracteres
       fecha: ['', [Validators.required, fechaFuturaValidator]], // Obligatorio y debe ser hoy o futuro
       hora: ['', [Validators.required]], // Obligatorio
       motivo: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]], // Obligatorio, entre 10 y 200 caracteres
