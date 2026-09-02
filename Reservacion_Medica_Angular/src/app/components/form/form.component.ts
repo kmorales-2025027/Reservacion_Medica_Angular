@@ -16,6 +16,18 @@ export function fechaFuturaValidator(control: AbstractControl): ValidationErrors
   return fechaSeleccionada < hoy ? { fechaPasada: true } : null;
 }
 
+/**
+ * Validador personalizado para asegurar que la fecha seleccionada no sea anterior al día actual.
+ * @param control El control de formulario que contiene la fecha.
+ * @returns ValidationErrors si la fecha es pasada, o null si es válida.
+ */
+export function fechaFuturaValidator(control: AbstractControl): ValidationErrors | null {
+  const fechaSeleccionada = new Date(control.value);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0); // Normalizar hoy a medianoche para comparar solo fechas
+  return fechaSeleccionada < hoy ? { fechaPasada: true } : null;
+}
+
 @Component({
   selector: 'app-form',
   standalone: true,
@@ -64,40 +76,39 @@ export class FormComponent implements OnInit {
    * Valida la integridad de los datos, verifica disponibilidad y gestiona la persistencia.
    */
   onSubmit(): void {
-    if (this.reservaForm.valid) {
-      // Extracción de los valores actuales del formulario (ya incluyen el estadoReserva)
-      const nuevaReserva: Reserva = this.reservaForm.value;
+    if (this.reservaForm.invalid) {
+      this.reservaForm.markAllAsTouched(); // Marca todos los campos como tocados para mostrar errores
+      console.error("El formulario contiene errores. Por favor, corríjalos antes de enviar.");
+      return;
+    }
+    const formValues = this.reservaForm.value;
 
-      // Verificación de choques de horario antes de guardar la reserva
-      if (this.reservaService.verificarChoqueHorario(nuevaReserva.fecha, nuevaReserva.hora)) {
-        alert('La fecha y hora seleccionadas ya están reservadas. Por favor, elija otro horario.');
-        return; // Detiene la ejecución para evitar que se guarde la reserva
-      }
-
-      // Persistencia de la reserva en el servicio
-      this.reservaService.agregarReserva(nuevaReserva);
-      console.log('Reserva guardada exitosamente');
-
-      // Limpieza del formulario devolviéndolo a su estado original
-      this.reservaForm.reset({
-        primeraConsulta: false,
-        estadoReserva: EstadoReserva.PROGRAMADA
-      });
-    } else {
-      console.error('El formulario contiene errores de validación');
+    if (this.reservaService.verificarChoqueHorario(formValues.fecha, formValues.hora, this.reservaOriginal)) {
+      alert("La fecha y hora seleccionadas ya están reservadas. Por favor, elija otro horario.");
+      return;
     }
 
-    const nuevaReserva: Reserva = {
-      ...this.reservaForm.value,
-      estadoReserva: EstadoReserva.PROGRAMADA
-    };
-
-    this.reservaService.agregarReserva(nuevaReserva);
-
-    console.log('Reserva guardada exitosamente');
+    if (this.reservaOriginal) {
+      const reservaActualizada: Reserva = {
+        ...this.reservaOriginal,
+        ...formValues
+      };
+      this.reservaService.actualizarReservaPorObjeto(this.reservaOriginal, reservaActualizada);
+      console.log("Reserva actualizada exitosamente:");
+      this.reservaService.setReservaEnEdicion(null);
+      this.reservaOriginal = null;
+    } else {
+      const nuevaReserva: Reserva = {
+        ...formValues,
+        estadoReserva: EstadoReserva.PROGRAMADA
+      };
+      this.reservaService.agregarReserva(nuevaReserva);
+      console.log("Reserva guardada exitosamente:");
+    }
 
     this.reservaForm.reset({
-      primeraConsulta: false
+      primeraConsulta: false,
+      estadoReserva: EstadoReserva.PROGRAMADA
     });
   }
 }
