@@ -1,0 +1,169 @@
+/* Contenedor principal de la vista */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* Título de la sección */
+.table-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+
+/* Controles de búsqueda y filtros */
+.search-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-input,
+.filter-select {
+  padding: 10px 16px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #374151;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-input:focus,
+.filter-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Reto adicional: Tarjetas de Resumen / Contadores */
+.resumen-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.resumen-card {
+  background: #ffffff;
+  padding: 16px 20px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  font-size: 14px;
+  color: #4b5563;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resumen-card strong {
+  font-size: 18px;
+  color: #2563eb;
+}
+
+/* Contenedor y diseño de la tabla */
+.table-container {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.reserva-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.reserva-table th {
+  background: #f9fafb;
+  color: #4b5563;
+  font-weight: 600;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.reserva-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #1f2937;
+}
+
+.reserva-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.reserva-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Badges de Estado Dinámicos */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-transform: capitalize;
+}
+
+/* Personalización según el estado (puedes ajustar los nombres exactos de tus estados) */
+.status-badge[data-status='Programada'],
+.status-badge[data-status='PROGRAMADA'] {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.status-badge[data-status='Atendida'],
+.status-badge[data-status='ATENDIDA'] {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.status-badge[data-status='Cancelada'],
+.status-badge[data-status='CANCELADA'] {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* Botones de acción */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons button {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.action-buttons button:hover {
+  background-color: #f3f4f6;
+}
+
+/* Estado sin reservas */
+.table-container p {
+  padding: 32px;
+  text-align: center;
+  color: #6b7280;
+  margin: 0;
+}

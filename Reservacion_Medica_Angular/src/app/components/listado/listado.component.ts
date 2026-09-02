@@ -56,6 +56,23 @@ export class Listado implements OnInit {
       this.onFilterChange();
     }
   }
+
+  // --- RETO ADICIONAL: CONTADOR DE CITAS ---
+  get totalReservas(): number {
+    return this.reservas.length;
+  }
+
+  get totalProgramadas(): number {
+    return this.reservas.filter(r => r.estadoReserva === EstadoReserva.PROGRAMADA).length;
+  }
+
+  get totalAtendidas(): number {
+    return this.reservas.filter(r => r.estadoReserva === EstadoReserva.ATENDIDA).length;
+  }
+
+  get totalCanceladas(): number {
+    return this.reservas.filter(r => r.estadoReserva === EstadoReserva.CANCELADA).length;
+  }
 }
 
 
