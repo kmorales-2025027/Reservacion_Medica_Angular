@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Reserva, EstadoReserva } from '../models/reserva.model';
 
 @Injectable({
@@ -6,16 +7,35 @@ import { Reserva, EstadoReserva } from '../models/reserva.model';
 })
 export class ReservaService {
   private reservaciones: Reserva[] = [];
+  private storageKey = 'reservaciones_medicas';
   private reservaEnEdicion: Reserva | null = null;
+  private esNavegador: boolean;
 
-  constructor() {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    this.esNavegador = isPlatformBrowser(this.platformId);
+    this.cargarDesdeStorage();
+  }
 
-  /**
-   * Verifica si existe una cita en la misma fecha y hora
-   * @param fecha Fecha a verificar
-   * @param hora Hora a verificar
-   * @returns true si hay un choque, false si está disponible
-   */
+  private cargarDesdeStorage(): void {
+    if (!this.esNavegador) return; // Si estamos en el servidor, no hacemos nada
+
+    const datos = localStorage.getItem(this.storageKey);
+    if (datos) {
+      try {
+        this.reservaciones = JSON.parse(datos);
+      } catch (e) {
+        console.error('Error al parsear las reservas del localStorage', e);
+        this.reservaciones = [];
+      }
+    }
+  }
+
+  private guardarEnStorage(): void {
+    if (!this.esNavegador) return; // Si estamos en el servidor, no guardamos
+
+    localStorage.setItem(this.storageKey, JSON.stringify(this.reservaciones));
+  }
+
   verificarChoqueHorario(fecha: string, hora: string, reservaExcluida?: Reserva | null): boolean {
     return this.reservaciones.some(reserva =>
       reserva.fecha === fecha && reserva.hora === hora && reserva !== reservaExcluida
@@ -23,11 +43,12 @@ export class ReservaService {
   }
 
   /**
-   * Agrega una nueva reservación al arreglo en memoria
+   * Agrega una nueva reservación al arreglo en localStorage
    * @param reserva Objeto de tipo Reserva con los datos del formulario
    */
   agregarReserva(reserva: Reserva): void {
     this.reservaciones.push(reserva);
+    this.guardarEnStorage();
   }
 
   obtenerReservaciones(): Reserva[] {
@@ -52,12 +73,14 @@ export class ReservaService {
 
   eliminarReservaPorObjeto(reserva: Reserva): void {
     this.reservaciones = this.reservaciones.filter(r => r !== reserva);
+    this.guardarEnStorage();
   }
 
   actualizarReservaPorObjeto(reservaOriginal: Reserva, reservaActualizada: Reserva): void {
     const index = this.reservaciones.indexOf(reservaOriginal);
     if (index !== -1) {
       this.reservaciones[index] = reservaActualizada;
+      this.guardarEnStorage();
     }
   }
 
@@ -66,6 +89,7 @@ export class ReservaService {
    */
   actualizarEstadoReserva(reserva: Reserva, nuevoEstado: EstadoReserva): void {
     reserva.estadoReserva = nuevoEstado;
+    this.guardarEnStorage();
   }
 
   setReservaEnEdicion(reserva: Reserva | null): void {
@@ -76,9 +100,3 @@ export class ReservaService {
     return this.reservaEnEdicion;
   }
 }
-
-
-
-
-
-
